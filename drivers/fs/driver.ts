@@ -72,6 +72,32 @@ export class FSDriver implements DriverContract {
   }
 
   /**
+   * Reads a specific range of bytes from the file using streams for memory efficiency
+   */
+  async #readRange(key: string, start: number, end: number): Promise<Uint8Array> {
+    const location = join(this.#rootUrl, key)
+    return this.#retrier.retry(async () => {
+      return new Promise<Uint8Array>((resolve, reject) => {
+        const chunks: Buffer[] = []
+        const stream = createReadStream(location, { start, end: end - 1 }) // end is inclusive in createReadStream
+
+        stream.on('data', (chunk: string | Buffer) => {
+          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+        })
+
+        stream.on('end', () => {
+          const buffer = Buffer.concat(chunks)
+          resolve(new Uint8Array(buffer))
+        })
+
+        stream.on('error', (error) => {
+          reject(error)
+        })
+      })
+    })
+  }
+
+  /**
    * Reads dir and ignores non-existing errors
    */
   async #readDir(location: string, recursive: boolean): Promise<Dirent[]> {
@@ -154,12 +180,12 @@ export class FSDriver implements DriverContract {
    */
   async getBytes(key: string, getBytesOptions?: GetBytesOptions): Promise<Uint8Array> {
     debug('reading file contents as array buffer %s:%s', this.#rootUrl, key)
-    const file = await this.#read(key).then((value) => new Uint8Array(value.buffer))
 
     if (getBytesOptions?.range) {
-      return file.subarray(getBytesOptions.range[0], getBytesOptions.range[1])
+      return this.#readRange(key, getBytesOptions.range[0], getBytesOptions.range[1])
     }
 
+    const file = await this.#read(key).then((value) => new Uint8Array(value.buffer))
     return file
   }
 
