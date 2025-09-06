@@ -199,8 +199,8 @@ export class GCSDriver implements DriverContract {
     const response = await bucket.file(key).download(
       range
         ? {
-            start: getBytesOptions?.range?.[0],
-            end: getBytesOptions?.range?.[1],
+            start: getBytesOptions?.range?.start,
+            end: getBytesOptions?.range?.end,
           }
         : {}
     )

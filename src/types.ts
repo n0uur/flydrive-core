@@ -83,7 +83,10 @@ export type FileSnapshot = {
  * to upload files
  */
 export type GetBytesOptions = {
-  range?: [number, number]
+  range?: {
+    start: number
+    end?: number
+  }
 }
 
 /**

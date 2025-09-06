@@ -157,7 +157,7 @@ export class FSDriver implements DriverContract {
     const file = await this.#read(key).then((value) => new Uint8Array(value.buffer))
 
     if (getBytesOptions?.range) {
-      return file.subarray(getBytesOptions.range[0], getBytesOptions.range[1])
+      return file.subarray(getBytesOptions.range.start, getBytesOptions.range.end)
     }
 
     return file

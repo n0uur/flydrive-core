@@ -340,7 +340,7 @@ export class S3Driver implements DriverContract {
         Key: key,
         Bucket: this.options.bucket,
         ...(getBytesOptions?.range
-          ? { Range: `bytes=${getBytesOptions.range[0]}-${getBytesOptions.range[1]}` }
+          ? { Range: `bytes=${getBytesOptions.range.start}-${getBytesOptions.range.end || ''}` }
           : {}),
       })
     )
