@@ -79,6 +79,14 @@ export type FileSnapshot = {
 }
 
 /**
+ * Options accepted during the creation of a signed URL
+ * to upload files
+ */
+export type GetBytesOptions = {
+  range?: [number, number]
+}
+
+/**
  * The interface every driver must implement.
  */
 export interface DriverContract {
@@ -106,7 +114,7 @@ export interface DriverContract {
    * Should throw "E_CANNOT_READ_FILE" error when the file
    * does not exists.
    */
-  getBytes(key: string): Promise<Uint8Array>
+  getBytes(key: string, options?: GetBytesOptions): Promise<Uint8Array>
 
   /**
    * Return metadata of an object for the given key.

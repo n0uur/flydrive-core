@@ -29,6 +29,7 @@ import type {
   ObjectVisibility,
   SignedURLOptions,
   UploadSignedURLOptions,
+  GetBytesOptions,
 } from '../../src/types.js'
 
 /**
@@ -151,9 +152,15 @@ export class FSDriver implements DriverContract {
    * Returns the contents of the file as an Uint8Array. An
    * exception is thrown when the file is missing.
    */
-  async getBytes(key: string): Promise<Uint8Array> {
+  async getBytes(key: string, getBytesOptions?: GetBytesOptions): Promise<Uint8Array> {
     debug('reading file contents as array buffer %s:%s', this.#rootUrl, key)
-    return this.#read(key).then((value) => new Uint8Array(value.buffer))
+    const file = await this.#read(key).then((value) => new Uint8Array(value.buffer))
+
+    if (getBytesOptions?.range) {
+      return file.subarray(getBytesOptions.range[0], getBytesOptions.range[1])
+    }
+
+    return file
   }
 
   /**

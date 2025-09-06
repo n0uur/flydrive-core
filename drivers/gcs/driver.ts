@@ -28,6 +28,7 @@ import type {
   SignedURLOptions,
   ObjectVisibility,
   UploadSignedURLOptions,
+  GetBytesOptions,
 } from '../../src/types.js'
 
 /**
@@ -191,11 +192,18 @@ export class GCSDriver implements DriverContract {
    * Returns the contents of the file as an Uint8Array. An
    * exception is thrown when the file is missing.
    */
-  async getBytes(key: string): Promise<Uint8Array> {
+  async getBytes(key: string, getBytesOptions?: GetBytesOptions): Promise<Uint8Array> {
     debug('reading file contents as array buffer %s:%s', this.options.bucket, key)
     const bucket = this.#storage.bucket(this.options.bucket)
-
-    const response = await bucket.file(key).download()
+    const range = getBytesOptions?.range
+    const response = await bucket.file(key).download(
+      range
+        ? {
+            start: getBytesOptions?.range?.[0],
+            end: getBytesOptions?.range?.[1],
+          }
+        : {}
+    )
     return new Uint8Array(response[0])
   }
 

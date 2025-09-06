@@ -15,6 +15,7 @@ import { KeyNormalizer } from './key_normalizer.js'
 import type {
   DriverContract,
   FileSnapshot,
+  GetBytesOptions,
   ObjectMetaData,
   ObjectVisibility,
   SignedURLOptions,
@@ -103,9 +104,9 @@ export class DriveFile {
   /**
    * Returns file contents as a Uint8Array.
    */
-  async getBytes(): Promise<Uint8Array> {
+  async getBytes(options?: GetBytesOptions): Promise<Uint8Array> {
     try {
-      return await this.#driver.getBytes(this.key)
+      return await this.#driver.getBytes(this.key, options)
     } catch (error) {
       throw new errors.E_CANNOT_READ_FILE([this.key], { cause: error })
     }

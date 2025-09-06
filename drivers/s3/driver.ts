@@ -44,6 +44,7 @@ import type {
   ObjectVisibility,
   SignedURLOptions,
   UploadSignedURLOptions,
+  GetBytesOptions,
 } from '../../src/types.js'
 import string from '@poppinss/utils/string'
 
@@ -332,12 +333,15 @@ export class S3Driver implements DriverContract {
    * Returns the contents of the file as an Uint8Array. An
    * exception is thrown when the file is missing.
    */
-  async getBytes(key: string): Promise<Uint8Array> {
+  async getBytes(key: string, getBytesOptions?: GetBytesOptions): Promise<Uint8Array> {
     debug('reading file contents as array buffer %s:%s', this.options.bucket, key)
     const response = await this.#client.send(
       this.createGetObjectCommand(this.#client, {
         Key: key,
         Bucket: this.options.bucket,
+        ...(getBytesOptions?.range
+          ? { Range: `bytes=${getBytesOptions.range[0]}-${getBytesOptions.range[1]}` }
+          : {}),
       })
     )
 

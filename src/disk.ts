@@ -22,6 +22,7 @@ import type {
   DriverContract,
   ObjectVisibility,
   SignedURLOptions,
+  GetBytesOptions,
 } from './types.js'
 
 /**
@@ -82,8 +83,8 @@ export class Disk {
   /**
    * Returns file contents as a Uint8Array.
    */
-  getBytes(key: string): Promise<Uint8Array> {
-    return this.file(key).getBytes()
+  getBytes(key: string, options?: GetBytesOptions): Promise<Uint8Array> {
+    return this.file(key).getBytes(options)
   }
 
   /**
