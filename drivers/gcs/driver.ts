@@ -196,14 +196,17 @@ export class GCSDriver implements DriverContract {
     debug('reading file contents as array buffer %s:%s', this.options.bucket, key)
     const bucket = this.#storage.bucket(this.options.bucket)
     const range = getBytesOptions?.range
-    const response = await bucket.file(key).download(
-      range
-        ? {
-            start: getBytesOptions?.range?.[0],
-            end: getBytesOptions?.range?.[1],
-          }
-        : {}
-    )
+    const downloadOptions: { start?: number; end?: number } = {}
+
+    if (range) {
+      downloadOptions.start = range[0]
+      // Only set end if it's defined, otherwise read to end of file
+      if (range[1] !== undefined) {
+        downloadOptions.end = range[1]
+      }
+    }
+
+    const response = await bucket.file(key).download(downloadOptions)
     return new Uint8Array(response[0])
   }
 

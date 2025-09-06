@@ -74,12 +74,19 @@ export class FSDriver implements DriverContract {
   /**
    * Reads a specific range of bytes from the file using streams for memory efficiency
    */
-  async #readRange(key: string, start: number, end: number): Promise<Uint8Array> {
+  async #readRange(key: string, start: number, end?: number): Promise<Uint8Array> {
     const location = join(this.#rootUrl, key)
     return this.#retrier.retry(async () => {
       return new Promise<Uint8Array>((resolve, reject) => {
         const chunks: Buffer[] = []
-        const stream = createReadStream(location, { start, end: end - 1 }) // end is inclusive in createReadStream
+        const streamOptions: { start: number; end?: number } = { start }
+
+        // Only set end if it's defined, otherwise read to end of file
+        if (end !== undefined) {
+          streamOptions.end = end - 1 // end is inclusive in createReadStream
+        }
+
+        const stream = createReadStream(location, streamOptions)
 
         stream.on('data', (chunk: string | Buffer) => {
           chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))

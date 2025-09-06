@@ -335,14 +335,20 @@ export class S3Driver implements DriverContract {
    */
   async getBytes(key: string, getBytesOptions?: GetBytesOptions): Promise<Uint8Array> {
     debug('reading file contents as array buffer %s:%s', this.options.bucket, key)
+
+    const commandOptions: GetObjectCommandInput = {
+      Key: key,
+      Bucket: this.options.bucket,
+    }
+
+    if (getBytesOptions?.range) {
+      const [start, end] = getBytesOptions.range
+      // If end is undefined, omit it to read from start to end of file
+      commandOptions.Range = end !== undefined ? `bytes=${start}-${end}` : `bytes=${start}-`
+    }
+
     const response = await this.#client.send(
-      this.createGetObjectCommand(this.#client, {
-        Key: key,
-        Bucket: this.options.bucket,
-        ...(getBytesOptions?.range
-          ? { Range: `bytes=${getBytesOptions.range[0]}-${getBytesOptions.range[1]}` }
-          : {}),
-      })
+      this.createGetObjectCommand(this.#client, commandOptions)
     )
 
     return response.Body!.transformToByteArray()
