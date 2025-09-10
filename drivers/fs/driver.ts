@@ -142,10 +142,13 @@ export class FSDriver implements DriverContract {
    * Returns the contents of the file as a stream. An
    * exception is thrown when the file is missing.
    */
-  async getStream(key: string): Promise<Readable> {
+  async getStream(key: string, getBytesOptions?: GetBytesOptions): Promise<Readable> {
     debug('reading file contents as a stream %s:%s', this.#rootUrl, key)
     const location = join(this.#rootUrl, key)
-    return createReadStream(location)
+    return createReadStream(location, {
+      start: getBytesOptions?.range?.start,
+      end: getBytesOptions?.range?.end,
+    })
   }
 
   /**

@@ -16,6 +16,7 @@ import type {
   DriverContract,
   FileSnapshot,
   GetBytesOptions,
+  GetStreamOptions,
   ObjectMetaData,
   ObjectVisibility,
   SignedURLOptions,
@@ -93,9 +94,9 @@ export class DriveFile {
   /**
    * Returns file contents as a Readable stream.
    */
-  async getStream(): Promise<Readable> {
+  async getStream(options?: GetStreamOptions): Promise<Readable> {
     try {
-      return await this.#driver.getStream(this.key)
+      return await this.#driver.getStream(this.key, options)
     } catch (error) {
       throw new errors.E_CANNOT_READ_FILE([this.key], { cause: error })
     }

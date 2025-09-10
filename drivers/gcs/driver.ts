@@ -29,6 +29,7 @@ import type {
   ObjectVisibility,
   UploadSignedURLOptions,
   GetBytesOptions,
+  GetStreamOptions,
 } from '../../src/types.js'
 
 /**
@@ -181,11 +182,14 @@ export class GCSDriver implements DriverContract {
    * Returns the contents of the file as a Readable stream. An
    * exception is thrown when the file is missing.
    */
-  async getStream(key: string): Promise<Readable> {
+  async getStream(key: string, getStreamOptions?: GetStreamOptions): Promise<Readable> {
     debug('reading file contents as a stream %s:%s', this.options.bucket, key)
     const bucket = this.#storage.bucket(this.options.bucket)
 
-    return bucket.file(key).createReadStream()
+    return bucket.file(key).createReadStream({
+      start: getStreamOptions?.range?.start,
+      end: getStreamOptions?.range?.end,
+    })
   }
 
   /**

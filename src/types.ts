@@ -90,6 +90,16 @@ export type GetBytesOptions = {
 }
 
 /**
+ * Options accepted during the retrieval of a stream.
+ */
+export type GetStreamOptions = {
+  range?: {
+    start: number
+    end?: number
+  }
+}
+
+/**
  * The interface every driver must implement.
  */
 export interface DriverContract {
@@ -110,7 +120,7 @@ export interface DriverContract {
    * Should throw "E_CANNOT_READ_FILE" error when the file
    * does not exists.
    */
-  getStream(key: string): Promise<Readable>
+  getStream(key: string, options?: GetStreamOptions): Promise<Readable>
 
   /**
    * Return contents of an object for the given key as an Uint8Array.

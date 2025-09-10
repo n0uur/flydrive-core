@@ -45,6 +45,7 @@ import type {
   SignedURLOptions,
   UploadSignedURLOptions,
   GetBytesOptions,
+  GetStreamOptions,
 } from '../../src/types.js'
 import string from '@poppinss/utils/string'
 
@@ -317,12 +318,15 @@ export class S3Driver implements DriverContract {
    * Returns the contents of the file as a Readable stream. An
    * exception is thrown when the file is missing.
    */
-  async getStream(key: string): Promise<Readable> {
+  async getStream(key: string, getStreamOptions?: GetStreamOptions): Promise<Readable> {
     debug('reading file contents as a stream %s:%s', this.options.bucket, key)
     const response = await this.#client.send(
       this.createGetObjectCommand(this.#client, {
         Key: key,
         Bucket: this.options.bucket,
+        ...(getStreamOptions?.range
+          ? { Range: `bytes=${getStreamOptions.range.start}-${getStreamOptions.range.end || ''}` }
+          : {}),
       })
     )
 

@@ -23,6 +23,7 @@ import type {
   ObjectVisibility,
   SignedURLOptions,
   GetBytesOptions,
+  GetStreamOptions,
 } from './types.js'
 
 /**
@@ -76,8 +77,8 @@ export class Disk {
   /**
    * Returns file contents as a Readable stream.
    */
-  getStream(key: string): Promise<Readable> {
-    return this.file(key).getStream()
+  getStream(key: string, options?: GetStreamOptions): Promise<Readable> {
+    return this.file(key).getStream(options)
   }
 
   /**
